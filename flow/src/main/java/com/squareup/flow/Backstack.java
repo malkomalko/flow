@@ -82,6 +82,46 @@ public final class Backstack implements Iterable<Backstack.Entry> {
     return backstack.toString();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Backstack entries = (Backstack) o;
+
+    return highestId == entries.highestId && equals(backstack, entries.backstack);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (highestId ^ (highestId >>> 32));
+    result = 31 * result + hashCode(backstack);
+    return result;
+  }
+
+  private static <T> boolean equals(Deque<T> a, Deque<T> b) {
+    if (a.size() != b.size()) {
+      return false;
+    }
+
+    Iterator<?> it1 = a.iterator(), it2 = b.iterator();
+    while (it1.hasNext()) {
+      Object e1 = it1.next(), e2 = it2.next();
+      if (!e1.equals(e2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static <T> int hashCode(Iterable<T> iterable) {
+    int result = 1;
+    for (T object : iterable) {
+      result = (31 * result) + (object == null ? 0 : object.hashCode());
+    }
+    return result;
+  }
+
   public static final class Entry {
     private final long id;
     private final Screen screen;
@@ -101,6 +141,23 @@ public final class Backstack implements Iterable<Backstack.Entry> {
 
     @Override public String toString() {
       return "{" + id + ", " + screen + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      Entry entry = (Entry) o;
+
+      return id == entry.id && screen.equals(entry.screen);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = (int) (id ^ (id >>> 32));
+      result = 31 * result + screen.hashCode();
+      return result;
     }
   }
 
